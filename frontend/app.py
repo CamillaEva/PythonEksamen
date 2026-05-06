@@ -1,5 +1,8 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+from mistralai.client import MistralClient
+from dotenv import load_dotenv
+import os
 
 
 
@@ -51,3 +54,37 @@ def donut(percent):
     return fig
 
 st.pyplot(donut(50))
+
+# ----- MISTRAL -----
+
+load_dotenv()
+
+client = MistralClient(
+    api_key=os.getenv("MISTRAL_API_KEY")
+)
+
+st.title("healthy recipes for you")
+
+user_prompt = st.text_area("write your prompt here")
+
+if st.button("send"):
+    if user_prompt:
+        with st.spinner("generating response..."):
+            try: 
+                response = client.chat(
+                    model="mistral-small-latest", 
+                    messages=[{
+                        "role": "user",
+                        "content": user_prompt
+                        }]
+                    )
+                
+                answer = response.choices[0].message.content
+
+                st.subheader("response")
+
+                st.write(answer)
+
+            except Exception as e:
+                st.error(f"Error: {e}")
+

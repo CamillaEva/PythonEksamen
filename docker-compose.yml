@@ -16,3 +16,6 @@ services:
       - "8501:8501"
     volumes:
       - ./frontend:/app
+    env_file:
+      - ./frontend/.env
+    
