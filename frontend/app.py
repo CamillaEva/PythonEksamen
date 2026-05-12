@@ -1,9 +1,9 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import pandas as pd
 from mistralai.client import MistralClient
 from dotenv import load_dotenv
 import os
-
 
 
 
@@ -18,17 +18,50 @@ with col1:
     st.subheader("FOODLOG")
 
     meal = st.text_input("Hvad har du spist i dag?")
+    amount = st.text_input("Hvor meget? (gram)")
+    meals = st.selectbox("Hvilket måltid er det?", ("Morgenmad", "Frokost", "Aftensmad", "Snacks"))
+    file_name = "foodlog.csv"
 
-    st.markdown("### Morgenmad")
-    st.write("100 g kyllingebryst")
-    st.write("30 g mayonnaise")
+    if st.button("Gem"):
+        new_data = {
+            "Måltid":[meals],
+            "Mad":[meal],
+            "Gram":[amount]
+        }
 
-    st.markdown("### Frokost")
-    st.write("100 g kyllingebryst")
+        df_new = pd.DataFrame(new_data)
 
-    st.markdown("### Aftensmad")
-    st.write("...")
+        if os.path.exists(file_name):
+            df_new.to_csv(file_name, mode="a", header=False, index=False)
+        else:
+            df_new.to_csv(file_name, index=False)
 
+        st.success("Måltid gemt!")
+
+    if os.path.exists(file_name):
+
+        df = pd.read_csv(file_name)
+
+        #Morgenmad
+        st.markdown("### Morgenmad")
+        for index, row in df[df["Måltid"] == "Morgenmad"].iterrows():
+            st.write(f"{row["Mad"]} - {row["Gram"]} gram")
+
+        #Frokost
+        st.markdown("### Frokost")
+        for index, row in df[df["Måltid"] == "Frokost"].iterrows():
+            st.write(f"{row["Mad"]} - {row["Gram"]} gram")
+
+        #Aftensmad
+        st.markdown("### Aftensmad")
+        for index, row in df[df["Måltid"] == "Aftensmad"].iterrows():
+            st.write(f"{row["Mad"]} - {row["Gram"]} gram")
+
+        #Snacks
+        st.markdown("### Snacks")
+        for index, row in df[df["Måltid"] == "Aftensmad"].iterrows():
+            st.write(f"{row["Mad"]} - {row["Gram"]} gram")
+   
 
 #kolonne 2
 with col2:
