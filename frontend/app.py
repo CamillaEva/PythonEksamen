@@ -95,7 +95,7 @@ Prøv at tilføje mere protein til aftensmad.
 
 # ----- Mistral -----
 
-from components.recipes import show_recipes
+from components.Recipes import show_recipes
 
 load_dotenv()
 
