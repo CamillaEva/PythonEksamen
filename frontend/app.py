@@ -1,9 +1,11 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import pandas as pd
+from components.donut_chart import donut_chart
+from services.api_client import get_calories
 from mistralai.client import MistralClient
 from dotenv import load_dotenv
 import os
-
 
 
 
@@ -17,36 +19,77 @@ with col1:
     st.title("Daily Board")
     st.subheader("FOODLOG")
 
-    meal = st.text_input("Hvad har du spist i dag?")
+    food = st.text_input("What have you eaten today?")
+    amount = st.text_input("How much? (gram)")
+    meals = st.selectbox("Which meal is it?", ("Breakfast", "Lunch", "Dinner", "Snacks"))
+    file_name = "foodlog.csv"
 
-    st.markdown("### Morgenmad")
-    st.write("100 g kyllingebryst")
-    st.write("30 g mayonnaise")
+    if st.button("Save"):
 
-    st.markdown("### Frokost")
-    st.write("100 g kyllingebryst")
+        calories = get_calories(food, amount)
 
-    st.markdown("### Aftensmad")
-    st.write("...")
+        new_data = {
+            "Meal":[meals],
+            "Food":[food],
+            "Gram":[amount],
+            "Calories":[calories]
+        }
 
+        df_new = pd.DataFrame(new_data)
+
+        if os.path.exists(file_name):
+            df_new.to_csv(file_name, mode="a", header=False, index=False)
+        else:
+            df_new.to_csv(file_name, index=False)
+
+        st.success("Meal saved!")
+
+    if os.path.exists(file_name):
+
+        df = pd.read_csv(file_name)
+
+        #Morgenmad
+        st.markdown("### Breakfast")
+        for index, row in df[df["Meal"] == "Breakfast"].iterrows():
+            st.write(f"{row["Food"]} - {row["Gram"]} gram")
+
+        #Frokost
+        st.markdown("### Lunch")
+        for index, row in df[df["Meal"] == "Lunch"].iterrows():
+            st.write(f"{row["Food"]} - {row["Gram"]} gram")
+
+        #Aftensmad
+        st.markdown("### Dinner")
+        for index, row in df[df["Meal"] == "Dinner"].iterrows():
+            st.write(f"{row["Food"]} - {row["Gram"]} gram")
+
+        #Snacks
+        st.markdown("### Snacks")
+        for index, row in df[df["Meal"] == "Snacks"].iterrows():
+            st.write(f"{row["Food"]} - {row["Gram"]} gram")
+   
 
 #kolonne 2
 with col2:
     st.markdown("### ")
 
-    percent = 50
+    daily_goal = 2100
+    total_calories = 0
 
-    st.progress(percent / 100)
-    st.write(f"**{percent}%** af dine daglige kcal brugt")
+    if os.path.exists(file_name):
+        df = pd.read_csv(file_name)
+        total_calories = df["Calories"].sum()
+
+    fig = donut_chart(total_calories, daily_goal)
+    st.pyplot(fig)
 
 
-def donut(percent):
-    fig, ax = plt.subplots()
-    ax.pie([percent, 100-percent], startangle=90)
-    ax.axis("equal")
-    return fig
+st.markdown("## FEEDBACK")
 
-st.pyplot(donut(50))
+st.info("""
+Du ligger på et moderat kalorieindtag i dag.
+Prøv at tilføje mere protein til aftensmad.
+""")
 
 
 
