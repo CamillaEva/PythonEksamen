@@ -1,26 +1,27 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def donut_chart(calories, daily_goal):
 
-def donut_chart(used, total):
-    free = total - used
-    values = [used, free]
+    used_percent = (calories / daily_goal) * 100
+    remaining_percent = 100 - used_percent
     colors = ["#F9C5C4", "#f0f2f6"]
+
+    sizes = [used_percent, remaining_percent]
 
     fig, ax = plt.subplots()
 
     ax.pie(
-        values,
+        sizes,
         colors=colors,
         startangle=90,
         counterclock=False,
         radius=0.7,
-        wedgeprops={"width": 0.25}
+        wedgeprops={"width": 0.15}
     )
 
-    percent = round((used / total) * 100)
-
-    ax.text(0, 0, f"{percent}%", ha="center", va="center")
+    ax.text(0, 0.5, f"{int(used_percent)}%", ha="center", va="center")
+    ax.text(0,-0.12, f"{calories} out of {daily_goal} used", ha="center", va="center")
 
     ax.set_aspect("equal")
 
