@@ -40,13 +40,6 @@ with col2:
     st.write(f"**{percent}%** af dine daglige kcal brugt")
 
 
-st.markdown("## FEEDBACK")
-
-st.info("""
-Du ligger på et moderat kalorieindtag i dag.
-Prøv at tilføje mere protein til aftensmad.
-""")
-
 def donut(percent):
     fig, ax = plt.subplots()
     ax.pie([percent, 100-percent], startangle=90)
@@ -55,7 +48,11 @@ def donut(percent):
 
 st.pyplot(donut(50))
 
-# ----- MISTRAL -----
+
+
+# ----- Mistral -----
+
+from components.recipes import show_recipes
 
 load_dotenv()
 
@@ -65,26 +62,4 @@ client = MistralClient(
 
 st.title("healthy recipes for you")
 
-user_prompt = st.text_area("write your prompt here")
-
-if st.button("send"):
-    if user_prompt:
-        with st.spinner("generating response..."):
-            try: 
-                response = client.chat(
-                    model="mistral-small-latest", 
-                    messages=[{
-                        "role": "user",
-                        "content": user_prompt
-                        }]
-                    )
-                
-                answer = response.choices[0].message.content
-
-                st.subheader("response")
-
-                st.write(answer)
-
-            except Exception as e:
-                st.error(f"Error: {e}")
-
+show_recipes(client)
