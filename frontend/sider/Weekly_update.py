@@ -1,4 +1,4 @@
-from components.Bar_chart import bar_chart
+from components.bar_chart import bar_chart
 import numpy as np
 import streamlit as st
 import pandas as pd
