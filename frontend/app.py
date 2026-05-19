@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import date
 from components.donut_chart import donut_chart
 from services.api_client import get_calories
-from mistralai.client import Mistral
+from mistralai.client import MistralClient
 from dotenv import load_dotenv
 import os
 
@@ -164,7 +164,7 @@ def show_dashboard_page():
 
         from components.Recipes2 import show_recipes2
 
-        client = Mistral(
+        client = MistralClient(
             api_key=os.getenv("MISTRAL_API_KEY")
         )
 

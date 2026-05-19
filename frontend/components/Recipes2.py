@@ -12,8 +12,8 @@ def show_recipes2(client):
         Return ONLY the titles, one per line.
         """
 
-        response = client.chat.complete(
-            model="mistral-small-latest",
+        response = client.chat(
+            model="open-mistral-7b",
             messages=[{
                 "role": "user",
                 "content": prompt
@@ -50,8 +50,8 @@ def show_recipes2(client):
                 - protein amount
                 """
 
-                response = client.chat.complete(
-                    model="mistral-small-latest",
+                response = client.chat(
+                    model="open-mistral-7b",
                     messages=[{
                         "role": "user",
                         "content": detail_prompt
