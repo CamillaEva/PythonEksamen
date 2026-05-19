@@ -1,35 +1,36 @@
 import matplotlib.pyplot as plt
 
-#plt.style.use('_mpl-gallery')
+def bar_chart(daily_kcal):
+    fig, ax = plt.subplots(figsize=(5, 2.5))
 
-#make data
-#days = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"]
-#values = [1610, 1555, 1880, 1532, 1969, 2000, 1545]
-
-#fig, ax = plt.subplots()
-
-#ax.bar(days, values)
-
-#ax.set_xlabel("Ugedage")
-#ax.set_ylabel("kcal")
-#ax.set_title("ugens kcal")
-
-#ax.bar(days, values, color="#F9C5C4", edgecolor="#3A3A3A")
-
-#plt.show()
-
-#st.pyplot(fig)
+    ax.bar(daily_kcal.index, daily_kcal.values, color="#F9C5C4")
+    
+    fig.patch.set_facecolor("#FDF0E6")
+    ax.set_facecolor("#FDF0E6")
 
 
-def weekly_calorie_chart(days, values):
-    plt.style.use('_mpl-gallery')
+    goal = 2100
+    ax.axhline(
+        y=goal,
+        color="red",
+        linestyle="--",
+        linewidth=2,
+        label=f"Goal: {goal} kcal"
+    )
 
-    fig, ax = plt.subplots()
 
-    ax.bar(days, values, color="#F9C5C4", edgecolor="#3A3A3A")
 
-    ax.set_xlabel("Ugedage")
-    ax.set_ylabel("kcal")
-    ax.set_title("Ugens kcal")
+    ax.set_title("Calories per day (last 7 days)")
+    ax.set_ylabel("Calories")
+    ax.set_xlabel("Date")
+    
+    ax.bar(
+    daily_kcal.index,
+    daily_kcal.values,
+    color="#F9C5C4",
+    edgecolor="#3A3A3A",
+    linewidth=1 )
+
+    plt.xticks(rotation=45)
 
     return fig
