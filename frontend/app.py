@@ -119,27 +119,21 @@ def show_dashboard_page():
             today = date.today().isoformat()
             df_today = df[df["Date"] == today]
 
-            #Morgenmad
-            st.markdown("### Breakfast")
-            for index, row in df_today[df_today['Meal'] == 'Breakfast'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
+            def show_meal_section (meal, df_today):
+                st.markdown(f"### {meal} ###")
+                meal_rows = df_today[df_today["Meal"] == meal]
 
-            #Frokost
-            st.markdown("### Lunch")
-            for index, row in df_today[df_today['Meal'] == 'Lunch'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
+                if meal_rows.empty:
+                    st.write("No meals added yet.")
+                
+                for index, row in meal_rows.iterrows():
+                    st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
 
-            #Aftensmad
-            st.markdown("### Dinner")
-            for index, row in df_today[df_today['Meal'] == 'Dinner'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
-
-            #Snacks
-            st.markdown("### Snacks")
-            for index, row in df_today[df_today['Meal'] == 'Snacks'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
-    
-
+            show_meal_section("Breakfast", df_today)
+            show_meal_section("Lunch", df_today)
+            show_meal_section("Dinner", df_today)
+            show_meal_section("Snacks", df_today)
+            
     # ----- kolonne 2 -----
     with col2:
         st.markdown("### ")
