@@ -45,6 +45,20 @@ st.markdown("""
     border-radius: 10px;
 }
 
+/* Number input */
+.stNumberInput input {
+    background-color: #F9C5C4;
+    color: #3A3A3A;
+    border-radius: 10px;
+}
+    
+/* Plus/minus buttons */
+.stNumberInput button {
+    background-color: #F9C5C4 !important;
+    color: #3A3A3A !important;
+    border: none !important;
+}
+
 /* Selectbox */
 .stSelectbox > div > div {
     background-color: #F9C5C4;
@@ -86,7 +100,7 @@ def show_dashboard_page():
         st.subheader("FOODLOG")
 
         food = st.text_input("What have you eaten today?", width=400,)
-        amount = st.text_input("How much? (gram)", width=400)
+        amount = st.number_input("How much? (gram)", width=400)
         meals = st.selectbox("Which meal is it?", ("Breakfast", "Lunch", "Dinner", "Snacks"), width=400)
         file_name = "foodlog.csv"
 
@@ -119,27 +133,63 @@ def show_dashboard_page():
             today = date.today().isoformat()
             df_today = df[df["Date"] == today]
 
-            #Morgenmad
-            st.markdown("### Breakfast")
-            for index, row in df_today[df_today['Meal'] == 'Breakfast'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
+            def show_meal_section (meal, df_today, df, file_name):
+                st.markdown(f"### {meal} ###")
+                meal_rows = df_today[df_today["Meal"] == meal]
 
-            #Frokost
-            st.markdown("### Lunch")
-            for index, row in df_today[df_today['Meal'] == 'Lunch'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
+                if meal_rows.empty:
+                    st.write("No meals added yet.")
+                
+                for index, row in meal_rows.iterrows():
+                    col1, col2, col3 = st.columns([5,1,1])
 
-            #Aftensmad
-            st.markdown("### Dinner")
-            for index, row in df_today[df_today['Meal'] == 'Dinner'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
+                    with col1:
+                        st.write(
+                            f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories"
+                        )
 
-            #Snacks
-            st.markdown("### Snacks")
-            for index, row in df_today[df_today['Meal'] == 'Snacks'].iterrows():
-                st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
-    
+                    with col2:
+                        if st.button("Update", key=f"update_{index}"):
+                            st.session_state["edit_index"] = index
+                    
+                    with col3:
+                        if st.button("Delete", key=f"delete_{index}"):
+                            df = df.drop(index)
+                            df.to_csv(file_name, index=False)
+                            st.rerun()
+                
+            
+            # -------- Update form --------
+            if "edit_index" in st.session_state:
+                edit_index = st.session_state["edit_index"]
+                row = df.loc[edit_index]
 
+                st.markdown("### Update meal")
+
+                updated_food = st.text_input("Food", value=row["Food"])
+                updated_gram = st.number_input("Gram", value=row["Gram"])
+                updated_meal = st.selectbox("Meal", ["Breakfast", "Lunch", "Dinner", "Snacks"], 
+                                             index=["Breakfast", "Lunch", "Dinner", "Snacks"].index(row["Meal"]))
+                
+                if st.button("Save update"):
+                    updated_calories = get_calories(updated_food, updated_gram)
+
+                    df.loc[edit_index, "Food"] = updated_food
+                    df.loc[edit_index, "Gram"] = updated_gram
+                    df.loc[edit_index, "Meal"] = updated_meal
+                    df.loc[edit_index, "Calories"] = updated_calories
+
+                    df.to_csv(file_name, index=False)
+                    del st.session_state["edit_index"]
+                    st.success("Meal updated!")
+                    st.rerun()
+
+
+            show_meal_section("Breakfast", df_today, df, file_name)
+            show_meal_section("Lunch", df_today, df, file_name)
+            show_meal_section("Dinner", df_today, df, file_name)
+            show_meal_section("Snacks", df_today, df, file_name)
+            
     # ----- kolonne 2 -----
     with col2:
         st.markdown("### ")
@@ -181,7 +231,7 @@ selected = option_menu(
     default_index=0,
     orientation="horizontal",
     styles={
-    "container": {"background-color": "#F9C5C4"},
+    "container": {"background-color": "#F9C5C4", "padding": "0!important", "max-width": "100%"},
     "nav-link": {"font-size": "16px",},
     "nav-link-selected": {"background-color": "#3A3A3A",
                             "color": "#F9C5C4"},  
