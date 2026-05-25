@@ -1,6 +1,4 @@
 Date,Meal,Food,Gram,Calories
-2026-05-18,Breakfast,oats,66.0,248.0
-2026-05-17,Breakfast,oats,66.0,248.0
 2026-05-16,Dinner,oats,66.0,248.0
 2026-05-15,Breakfast,oats,66.0,248.0
 2026-05-14,Breakfast,oats,66.0,248.0
@@ -20,3 +18,9 @@ Date,Meal,Food,Gram,Calories
 2026-05-24,Breakfast,Strawberry,150.0,75.0
 2026-05-24,Breakfast,yoghurt,200.0,320.0
 2026-05-25,Dinner,Beef,217.0,280.0
+2026-05-25,Breakfast,Eggs,100.0,250.0
+2026-05-25,Lunch,Salad,150.0,200.0
+2026-05-25,Dinner,Pasta,200.0,300.0
+2026-05-25,Breakfast,oats,100.0,250.0
+2026-05-25,Lunch,Salad,150.0,200.0
+2026-05-25,Dinner,Pasta,200.0,300.0
