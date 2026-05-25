@@ -6,6 +6,7 @@ from components.donut_chart import donut_chart
 from services.api_client import get_calories
 from mistralai.client import MistralClient
 from dotenv import load_dotenv
+from services.food_api import (get_meals, save_meal, update_meal, delete_meal)
 import os
 
 
@@ -102,34 +103,30 @@ def show_dashboard_page():
         food = st.text_input("What have you eaten today?", width=400,)
         amount = st.number_input("How much? (gram)", width=400)
         meals = st.selectbox("Which meal is it?", ("Breakfast", "Lunch", "Dinner", "Snacks"), width=400)
-        file_name = "foodlog.csv"
+        
 
         if st.button("Save"):
 
             calories = get_calories(food, amount)
 
             new_data = {
-                "Date": [date.today().isoformat()],
-                "Meal":[meals],
-                "Food":[food],
-                "Gram":[amount],
-                "Calories":[calories]
+                "Date": date.today().isoformat(),
+                "Meal": meals,
+                "Food": food,
+                "Gram": amount,
+                "Calories": calories
             }
 
-            df_new = pd.DataFrame(new_data)
-
-            if os.path.exists(file_name):
-                df_new.to_csv(file_name, mode="a", header=False, index=False)
-            else:
-                df_new.to_csv(file_name, index=False)
+            save_meal(new_data)
 
             st.success("Meal saved!")
-
-        if os.path.exists(file_name):
-
-            df = pd.read_csv(file_name)
             
-            # det her har jeg sat ind:
+            meals_data = get_meals()
+
+            if meals_data:
+
+                df = pd.DataFrame(meals_data)
+            
             today = date.today().isoformat()
             df_today = df[df["Date"] == today]
 
@@ -154,9 +151,12 @@ def show_dashboard_page():
                     
                     with col3:
                         if st.button("Delete", key=f"delete_{index}"):
-                            df = df.drop(index)
-                            df.to_csv(file_name, index=False)
+                            delete_meal(index)
+
+                            st.success("Meal deleted!")
+
                             st.rerun()
+                            
                 
             
             # -------- Update form --------
@@ -174,12 +174,15 @@ def show_dashboard_page():
                 if st.button("Save update"):
                     updated_calories = get_calories(updated_food, updated_gram)
 
-                    df.loc[edit_index, "Food"] = updated_food
-                    df.loc[edit_index, "Gram"] = updated_gram
-                    df.loc[edit_index, "Meal"] = updated_meal
-                    df.loc[edit_index, "Calories"] = updated_calories
+                    updated_data = {
+                        "Date": row["Date"],
+                        "Meal": updated_meal,
+                        "Food": updated_food,
+                        "Gram": updated_gram,
+                        "Calories": updated_calories
+                    }
 
-                    df.to_csv(file_name, index=False)
+                    update_meal(edit_index, updated_data)
                     del st.session_state["edit_index"]
                     st.success("Meal updated!")
                     st.rerun()
