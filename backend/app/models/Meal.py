@@ -1,7 +1,12 @@
 from pydantic import BaseModel
+import os
 
-FILE_NAME = "foodlog.csv"
+TESTING = os.getenv("TESTING") == "true"
 
+if TESTING:
+    FILE_NAME = "test_foodlog.csv"
+else:
+    FILE_NAME = "foodlog.csv"
 
 class Meal(BaseModel):
     Date: str
