@@ -1,8 +1,5 @@
 from pydantic import BaseModel
 
-
-
-
 FILE_NAME = "foodlog.csv"
 
 

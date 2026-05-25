@@ -5,33 +5,31 @@ def show_about_page():
     st.title("About Us")
 
     st.markdown("""
-    ## Om os
+    Welcome to our health and food log app.
 
-    Velkommen til vores sundheds- og madlog-app.
-
-    Vi er et lille udviklingsteam med en passion for at gøre sundhed, kost og hverdagsvaner mere overskuelige og motiverende. Vores mål er at skabe et simpelt og brugervenligt værktøj, hvor du nemt kan få overblik over din daglige kost, kalorier og måltider.
+    We are a small development team with a passion for making health, nutrition, and everyday habits easier to manage and more motivating. Our goal is to create a simple and user-friendly tool where you can easily keep track of your daily meals, calories, and eating habits.
 
     ---
 
-    ## Hvad vores platform kan
+    ## What Our Platform Can Do
 
-    På vores hjemmeside kan du:
+    On our platform, you can:
 
-    - Logge dine daglige måltider hurtigt og nemt  
-    - Få automatisk beregning af kalorier for det, du spiser  
-    - Få et visuelt overblik over dit daglige kalorieforbrug via en donut-graf  
-    - Gemme og organisere dine måltider efter morgenmad, frokost, aftensmad og snacks  
-    - Få inspiration til sunde og proteinrige opskrifter genereret med AI  
-
-    ---
-
-    ## Vores mål
-
-    Vi ønsker at gøre det lettere for dig at tage kontrol over dine kostvaner uden besvær og komplicerede systemer. Alt er designet til at være hurtigt, simpelt og visuelt overskueligt, så du kan fokusere på dine mål i stedet for besværlige beregninger.
+    - Log your daily meals quickly and easily  
+    - Automatically calculate calories for the food you eat  
+    - Get a visual overview of your daily calorie intake through a donut chart  
+    - Save and organize your meals into breakfast, lunch, dinner, and snacks  
+    - Get inspiration for healthy and high-protein recipes generated with AI  
 
     ---
 
-    ## Hvem vi er
+    ## Our Goal
 
-    Vi er et mindre udviklingsteam, der arbejder med moderne webteknologier som Streamlit, Python og AI-integration. Projektet er udviklet som en del af et eksamensprojekt med fokus på brugervenlighed, datavisualisering og intelligent funktionalitet.
+    We want to make it easier for you to take control of your eating habits without complicated systems or unnecessary hassle. Everything is designed to be fast, simple, and visually clear, so you can focus on your goals instead of difficult calculations.
+
+    ---
+
+    ## Who We Are
+
+    We are a small development team working with modern web technologies such as Streamlit, Python, and AI integration. This project was developed as part of an exam project with a focus on user experience, data visualization, and intelligent functionality.
     """)

@@ -6,7 +6,7 @@ def show_contact_page():
     st.title("Contact")
 
     st.markdown("""
-    Hvis du har spørgsmål til projektet, er du velkommen til at kontakte os
+    If you have any questions about the project, feel free to contact us.
     """)
 
     st.divider()
@@ -16,18 +16,16 @@ def show_contact_page():
     with col1:
         st.subheader("Team")
 
-        st.write("**udvikler:** Lærke Lønborg")
-        st.write("**udvikler:** Camilla Eva Hansen")
-       
+        st.write("**Developer:** Lærke Lønborg")
+        st.write("**Developer:** Camilla Eva Hansen")
 
-        st.write("**Projekt:** Health App (Eksamensprojekt)")
+        st.write("**Project:** Health App (Exam Project)")
 
     with col2:
-        st.subheader("Kontakt")
+        st.subheader("Contact Information")
 
-        st.write("**Email:** eksempel@email.com")
-        st.write("**Telefon:** +45 xx xx xx xx")
+        st.write("**Email:** example@email.com")
+        st.write("**Phone:** +45 xx xx xx xx")
         st.write("**GitHub:** https://github.com/")
 
     st.divider()
-
