@@ -1,28 +1,29 @@
 import matplotlib.pyplot as plt
+from styles.colors import (BACKGROUND_COLOR, PRIMARY_CHART_COLOR, EDGE_COLOR)
+
+DONUT_WIDTH = 0.15
+DONUT_RADIUS = 0.8
 
 def donut_chart(calories, daily_goal):
 
     used_percent = (calories / daily_goal) * 100
     remaining_percent = 100 - used_percent
-    colors = ["#F9C5C4", "#FDF0E6"]
-    
 
     sizes = [used_percent, remaining_percent]
 
     fig, ax = plt.subplots()
 
-
-    fig.patch.set_facecolor("#FDF0E6")
-    ax.set_facecolor("#FDF0E6")
+    fig.patch.set_facecolor(BACKGROUND_COLOR)
+    ax.set_facecolor(BACKGROUND_COLOR)
 
     ax.pie(
         sizes,
-        colors=colors,
+        colors=[PRIMARY_CHART_COLOR, BACKGROUND_COLOR],
         startangle=90,
         counterclock=False,
-        radius=0.8,
-        wedgeprops={"width": 0.15, 
-                    "edgecolor": "#3A3A3A",
+        radius=DONUT_RADIUS,
+        wedgeprops={"width": DONUT_WIDTH, 
+                    "edgecolor": EDGE_COLOR,
                     "linewidth": 1}
     )
 
