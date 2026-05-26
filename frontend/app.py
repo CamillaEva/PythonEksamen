@@ -5,6 +5,7 @@ from datetime import date
 from components.donut_chart import donut_chart
 from services.api_client import get_calories
 from mistralai.client import MistralClient
+from components.recipes import show_recipes
 from dotenv import load_dotenv
 from services.food_api import (
     get_meals,
@@ -255,13 +256,11 @@ def show_dashboard_page():
 
         load_dotenv()
 
-        from frontend.components.recipes import show_recipes2
-
         client = MistralClient(
             api_key=os.getenv("MISTRAL_API_KEY")
         )
 
-        show_recipes2(client)
+        show_recipes(client)
 
 
 selected = option_menu(

@@ -36,7 +36,7 @@ def get_recipe_details(client, recipe):
     
     return ask_ai(client, detail_prompt)
 
-def show_recipe(client):
+def show_recipes(client):
     if "recipes" not in st.session_state:
         st.session_state["recipes"]= (
             get_recipe_titles(client)
