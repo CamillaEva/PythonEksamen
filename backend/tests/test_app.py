@@ -4,9 +4,20 @@ os.environ["TESTING"] = "true"
 
 from fastapi.testclient import TestClient
 from app.app import app
+import pandas as pd
 
 client = TestClient(app)
 
+def setup_function():
+    empty_df = pd.DataFrame(columns=[
+        "Date",
+        "Meal",
+        "Food",
+        "Gram",
+        "Calories"
+    ])
+
+    empty_df.to_csv("test_foodlog.csv", index=False)
 
 def test_get_meals():
     new_meal = {
@@ -49,6 +60,43 @@ def test_add_meal():
     assert response.json() == {"message": "Meal saved"}
 
 
+def test_update_meal():
+    new_meal = {
+        "Date" : "2026-05-26",
+        "Meal" : "Breakfast",
+        "Food" : "Yoghurt",
+        "Gram" : 150,
+        "Calories" : 100
+    }
+
+    client.post(
+        "/meals",
+        json=new_meal
+    )
+
+    updated_meal = {
+        "Date" : "2026-05-26",
+        "Meal" : "Breakfast",
+        "Food" : "Oats",
+        "Gram" : 100,
+        "Calories" : 250
+    }
+
+    response = client.put(
+        "/meals/0",
+        json=updated_meal
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "message" : "Meal updated"
+    }
+
+    response_get = client.get("/meals")
+    data = response_get.json()
+
+    assert data[0]["Food"] == "Oats"
+    assert data[0]["Calories"] == 250
 
 
 def test_delete_meal():
