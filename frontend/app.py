@@ -72,6 +72,7 @@ def show_meal_section(meal, df_today):
         with col2:
             if st.button("Update", key=f"update_{index}"):
                 st.session_state["edit_index"] = index
+                st.rerun()
         
         with col3:
             if st.button("Delete", key=f"delete_{index}"):
@@ -84,24 +85,28 @@ def show_add_meal_form(today):
     st.title("Daily board")
     st.subheader("FOODLOG")
 
-    food = st.text_input("What have you eaten today?", width=400)
-    amount = st.number_input("How much? (gram)", min_value=0, step=1, width=400)
-    meal = st.selectbox("Which meal is it?", MEAL_TYPES, width=400)
+    with st.form("meal_form", clear_on_submit=True, border=False):
+        food = st.text_input("What have you eaten today?", width=400)
+        gram = st.number_input("How much? (gram)", min_value=0, step=1, width=400)
+        meal = st.selectbox("Which meal is it?", MEAL_TYPES, width=400)
 
-    if st.button("Save"):
-        calories = get_calories(food, amount)
+        submitted = st.form_submit_button("Save")
 
-        new_data = {
-            "Date" : today,
-            "Meal" : meal,
-            "Food" : food,
-            "Gram" : amount, 
-            "Calories" : calories
-        }
+        if submitted:
+            calories = get_calories(food, gram)
 
-        save_meal(new_data)
-        st.success("Meal saved!")
-        st.rerun()
+            new_data = {
+                "Date" : today,
+                "Meal" : meal,
+                "Food" : food,
+                "Gram" : gram, 
+                "Calories" : calories
+            }
+
+            save_meal(new_data)
+
+            st.success("Meal saved!")
+            st.rerun()
 
 def show_update_form(df):
     if "edit_index" not in st.session_state:
