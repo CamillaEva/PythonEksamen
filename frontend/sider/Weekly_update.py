@@ -14,11 +14,11 @@ def show_weekly_page():
 
         df = pd.DataFrame(meals_data)
 
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df["Date"]).dt.date
 
         last_7_days = df[
             df["Date"] >= (
-                pd.Timestamp.today() - pd.Timedelta(days=7)
+                pd.Timestamp.today().date() - pd.Timedelta(days=7)
             )
         ]
 

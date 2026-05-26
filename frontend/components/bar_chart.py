@@ -18,8 +18,6 @@ def bar_chart(daily_kcal):
         label=f"Goal: {goal} kcal"
     )
 
-
-
     ax.set_title("Calories per day (last 7 days)")
     ax.set_ylabel("Calories")
     ax.set_xlabel("Date")
