@@ -2,7 +2,6 @@ import requests
 
 BASE_URL = "http://backend:8000"
 
-
 def get_meals():
     response = requests.get(f"{BASE_URL}/meals")
     return response.json()

@@ -294,13 +294,13 @@ if selected == "Dashboard":
     show_dashboard_page()
 
 if selected == "Weekly update":
-    from sider.Weekly_update import show_weekly_page
+    from pages.weekly_update import show_weekly_page
     show_weekly_page()
 
 if selected == "Contact":
-    from sider.Contact import show_contact_page
+    from pages.contact import show_contact_page
     show_contact_page()
 
 if selected == "About":
-    from sider.About import show_about_page
+    from pages.about import show_about_page
     show_about_page()
