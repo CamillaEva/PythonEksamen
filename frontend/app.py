@@ -5,6 +5,11 @@ from datetime import date
 from components.donut_chart import donut_chart
 from services.api_client import get_calories
 from mistralai.client import MistralClient
+from components.recipes import show_recipes
+from pages.weekly_update import show_weekly_page
+from pages.about import show_about_page
+from pages.contact import show_contact_page
+from styles.colors import (PRIMARY_CHART_COLOR, EDGE_COLOR)
 from dotenv import load_dotenv
 from services.food_api import (
     get_meals,
@@ -14,87 +19,39 @@ from services.food_api import (
 )
 import os
 
+# Constants
+MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snacks"]
+DAILY_GOAL_KCAL = 2100
+EMPTY_COLUMS = ["Date", "Meal", "Food", "Gram", "Calories"]
 
+# Styling
+def load_css():
+    with open("./styles/main.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Page config
 st.set_page_config(
     layout="wide",
     page_title="Health App",
-    page_icon="./images/favicon.png"
+    page_icon="./images/favicon.png",
 )
 
+load_css()
 
-st.markdown("""
-<style>
+# Mistral
+def create_mistral_client():
+    load_dotenv()
+    return MistralClient(api_key = os.getenv("MISTRAL_API_KEY"))
 
-.stApp {
-    background-color: #FDF0E6;
-    color: #3A3A3A;
-}
+# Data
+def create_meals_dataframe(meals_data):
+    if meals_data:
+        return pd.DataFrame(meals_data)
+    
+    return pd.DataFrame(columns=EMPTY_COLUMS)
 
-.stButton > button {
-    background-color: #F9C5C4;
-    color: #3A3A3A;
-    border-radius: 10px;
-    border: none;
-    padding: 0.5em 1em;
-    transition: 0.3s ease;
-}
-
-.stButton > button:hover {
-    background-color: #F5A3A1;
-    color: white;
-}
-
-/* Text input */
-.stTextInput > div > div > input {
-    background-color: #F9C5C4;
-    color: #3A3A3A;
-    border-radius: 10px;
-}
-
-/* Number input */
-.stNumberInput input {
-    background-color: #F9C5C4;
-    color: #3A3A3A;
-    border-radius: 10px;
-}
-
-/* Plus/minus buttons */
-.stNumberInput button {
-    background-color: #F9C5C4 !important;
-    color: #3A3A3A !important;
-    border: none !important;
-}
-
-/* Selectbox */
-.stSelectbox > div > div {
-    background-color: #F9C5C4;
-    border-radius: 10px;
-}
-
-details {
-    background-color: #F9C5C4;
-    border-radius: 12px;
-    padding: 5px;
-    margin-bottom: 10px;
-    border: none;
-}
-
-details summary {
-    color: #FDF0E6;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-/* Expander content */
-details p {
-    color: #3A3A3A;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-def show_meal_section(meal, df_today, df):
+# Meal sections
+def show_meal_section(meal, df_today):
     st.markdown(f"### {meal} ###")
 
     meal_rows = df_today[df_today["Meal"] == meal]
@@ -103,170 +60,116 @@ def show_meal_section(meal, df_today, df):
         st.write("No meals added yet.")
 
     for index, row in meal_rows.iterrows():
-
-        col1, col2, col3 = st.columns([5, 1, 1])
+        col1, col2, col3 = st.columns([5,1,1])
 
         with col1:
             st.write(
-                f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories"
+                f"{row['Food']} - "
+                f"{row['Gram']} gram - "
+                f"{row['Calories']} calories"
             )
-
+        
         with col2:
             if st.button("Update", key=f"update_{index}"):
                 st.session_state["edit_index"] = index
-
+        
         with col3:
             if st.button("Delete", key=f"delete_{index}"):
-
                 delete_meal(index)
-
                 st.success("Meal deleted!")
-
                 st.rerun()
 
+# Forms 
+def show_add_meal_form(today):
+    st.title("Daily board")
+    st.subheader("FOODLOG")
 
+    food = st.text_input("What have you eaten today?", width=400)
+    amount = st.number_input("How much? (gram)", min_value=0, step=1, width=400)
+    meal = st.selectbox("Which meal is it?", MEAL_TYPES, width=400)
+
+    if st.button("Save"):
+        calories = get_calories(food, amount)
+
+        new_data = {
+            "Date" : today,
+            "Meal" : meal,
+            "Food" : food,
+            "Gram" : amount, 
+            "Calories" : calories
+        }
+
+        save_meal(new_data)
+        st.success("Meal saved!")
+        st.rerun()
+
+def show_update_form(df):
+    if "edit_index" not in st.session_state:
+        return
+    
+    edit_index = st.session_state["edit_index"]
+    row = df.loc[edit_index]
+
+    st.markdown("### Update meal")
+    updated_food = st.text_input("Food", value=row["Food"])
+    updated_gram = st.number_input("Gram", min_value=0, step=1, value=int(row["Gram"]))
+    updated_meal = st.selectbox("Meal", MEAL_TYPES, index=MEAL_TYPES.index(row["Meal"]))
+
+    if st.button("Save update"):
+        updated_calories = get_calories(updated_food, updated_gram)
+
+        updated_data = {
+            "Date" : row["Date"],
+            "Meal" : updated_meal,
+            "Food" : updated_food,
+            "Gram" : updated_gram,
+            "Calories" : updated_calories
+        }
+
+        update_meal(edit_index, updated_data)
+
+        del st.session_state["edit_index"]
+        st.success("Meal updated!")
+        st.rerun()
+
+# Dashboard
 def show_dashboard_page():
-
     meals_data = get_meals()
 
-    if meals_data:
-        df = pd.DataFrame(meals_data)
-    else:
-        df = pd.DataFrame(
-            columns=["Date", "Meal", "Food", "Gram", "Calories"]
-        )
+    df = create_meals_dataframe(meals_data)
 
     today = date.today().isoformat()
+
     df_today = df[df["Date"] == today]
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([1,1])
 
-    # ----- kolonne 1 -----
     with col1:
+        show_add_meal_form(today)
+        show_update_form(df)
 
-        st.title("Daily Board")
-        st.subheader("FOODLOG")
-
-        food = st.text_input(
-            "What have you eaten today?",
-            width=400
-        )
-
-        amount = st.number_input(
-            "How much? (gram)",
-            min_value=0,
-            step=1,
-            width=400
-        )
-
-        meals = st.selectbox(
-            "Which meal is it?",
-            ("Breakfast", "Lunch", "Dinner", "Snacks"),
-            width=400
-        )
-
-        if st.button("Save"):
-
-            calories = get_calories(food, amount)
-
-            new_data = {
-                "Date": today,
-                "Meal": meals,
-                "Food": food,
-                "Gram": amount,
-                "Calories": calories
-            }
-
-            save_meal(new_data)
-
-            st.success("Meal saved!")
-
-            st.rerun()
-
-        # ----- update form -----
-        if "edit_index" in st.session_state:
-
-            edit_index = st.session_state["edit_index"]
-
-            row = df.loc[edit_index]
-
-            st.markdown("### Update meal")
-
-            updated_food = st.text_input(
-                "Food",
-                value=row["Food"]
-            )
-
-            updated_gram = st.number_input(
-                "Gram",
-                min_value=0,
-                step=1,
-                value=int(row["Gram"])
-            )
-
-            updated_meal = st.selectbox(
-                "Meal",
-                ["Breakfast", "Lunch", "Dinner", "Snacks"],
-                index=["Breakfast", "Lunch", "Dinner", "Snacks"].index(row["Meal"])
-            )
-
-            if st.button("Save update"):
-
-                updated_calories = get_calories(
-                    updated_food,
-                    updated_gram
-                )
-
-                updated_data = {
-                    "Date": row["Date"],
-                    "Meal": updated_meal,
-                    "Food": updated_food,
-                    "Gram": updated_gram,
-                    "Calories": updated_calories
-                }
-
-                update_meal(edit_index, updated_data)
-
-                del st.session_state["edit_index"]
-
-                st.success("Meal updated!")
-
-                st.rerun()
-
-        show_meal_section("Breakfast", df_today, df)
-        show_meal_section("Lunch", df_today, df)
-        show_meal_section("Dinner", df_today, df)
-        show_meal_section("Snacks", df_today, df)
-
-    # ----- kolonne 2 -----
+        for meal in MEAL_TYPES:
+            show_meal_section(meal, df_today)
+    
     with col2:
+        st.markdown("###")
+        total_calories = (df_today["Calories"].sum())
 
-        st.markdown("### ")
-
-        daily_goal = 2100
-
-        total_calories = df_today["Calories"].sum()
-
-        fig = donut_chart(total_calories, daily_goal)
+        fig = donut_chart(total_calories, DAILY_GOAL_KCAL)
 
         st.pyplot(fig)
+        client = create_mistral_client()
+        show_recipes(client)
 
-        # ----- mistral generator -----
-
-        load_dotenv()
-
-        from components.Recipes2 import show_recipes2
-
-        client = MistralClient(
-            api_key=os.getenv("MISTRAL_API_KEY")
-        )
-
-        show_recipes2(client)
-
-
+# Navigation
 selected = option_menu(
     menu_title=None,
-    options=["Dashboard", "Weekly update", "Contact", "About"],
+    options=[
+        "Dashboard",
+        "Weekly update",
+        "Contact",
+        "About"
+    ],
     icons=[
         "house-fill",
         "calendar-check-fill",
@@ -275,9 +178,9 @@ selected = option_menu(
     ],
     default_index=0,
     orientation="horizontal",
-    styles={
-        "container": {
-            "background-color": "#F9C5C4",
+    styles={ 
+         "container": {
+            "background-color": PRIMARY_CHART_COLOR,
             "padding": "0!important",
             "max-width": "100%"
         },
@@ -285,23 +188,21 @@ selected = option_menu(
             "font-size": "16px",
         },
         "nav-link-selected": {
-            "background-color": "#3A3A3A",
-            "color": "#F9C5C4"
+            "background-color": EDGE_COLOR,
+            "color": PRIMARY_CHART_COLOR
         },
     }
 )
 
+# Routing
 if selected == "Dashboard":
     show_dashboard_page()
 
-if selected == "Weekly update":
-    from sider.Weekly_update import show_weekly_page
+elif selected == "Weekly update":
     show_weekly_page()
 
-if selected == "Contact":
-    from sider.Contact import show_contact_page
+elif selected == "Contact":
     show_contact_page()
 
-if selected == "About":
-    from sider.About import show_about_page
+elif selected == "About":
     show_about_page()
