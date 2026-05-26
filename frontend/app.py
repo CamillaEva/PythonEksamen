@@ -255,7 +255,7 @@ def show_dashboard_page():
 
         load_dotenv()
 
-        from components.Recipes2 import show_recipes2
+        from frontend.components.recipes import show_recipes2
 
         client = MistralClient(
             api_key=os.getenv("MISTRAL_API_KEY")
