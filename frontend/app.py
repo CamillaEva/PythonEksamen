@@ -6,9 +6,9 @@ from components.donut_chart import donut_chart
 from services.api_client import get_calories
 from mistralai.client import MistralClient
 from components.recipes import show_recipes
-from pages.weekly_update import show_weekly_page
-from pages.about import show_about_page
-from pages.contact import show_contact_page
+from sider.weekly_update import show_weekly_page
+from sider.about import show_about_page
+from sider.contact import show_contact_page
 from styles.colors import (PRIMARY_CHART_COLOR, EDGE_COLOR)
 from dotenv import load_dotenv
 from services.food_api import (
