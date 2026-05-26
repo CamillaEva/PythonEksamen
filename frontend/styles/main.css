@@ -62,3 +62,17 @@ details summary {
 details p {
     color: #3A3A3A;
 }
+
+div[data-testid="stFormSubmitButton"] button {
+    background-color: #F9C5C4;
+    color: #3A3A3A;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+div[data-testid="stFormSubmitButton"] button:hover {
+    background-color: #efb1b0;
+    color: #3A3A3A;
+}
