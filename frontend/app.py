@@ -178,7 +178,7 @@ selected = option_menu(
     ],
     default_index=0,
     orientation="horizontal",
-    styles={ #TODO: se om farverne kan udskiftes med colors.py
+    styles={ 
          "container": {
             "background-color": PRIMARY_CHART_COLOR,
             "padding": "0!important",
