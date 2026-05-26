@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
-from styles.colors import (BACKGROUND_COLOR, PRIMARY_CHART_COLOR, EDGE_COLOR)
+from styles.colors import BACKGROUND_COLOR, PRIMARY_CHART_COLOR, EDGE_COLOR
 
 DONUT_WIDTH = 0.15
 DONUT_RADIUS = 0.8
+
 
 def donut_chart(calories, daily_goal):
 
@@ -22,14 +23,26 @@ def donut_chart(calories, daily_goal):
         startangle=90,
         counterclock=False,
         radius=DONUT_RADIUS,
-        wedgeprops={"width": DONUT_WIDTH, 
-                    "edgecolor": EDGE_COLOR,
-                    "linewidth": 1}
+        wedgeprops={"width": DONUT_WIDTH, "edgecolor": EDGE_COLOR, "linewidth": 1},
     )
 
-    ax.text(0, 0.15, f"{int(used_percent)}%", ha="center", va="center", fontsize=20, fontweight="bold")
-    ax.text(0,-0.15, f"{calories} out of {daily_goal} used", ha="center", va="center", fontsize=10)
-
+    ax.text(
+        0,
+        0.15,
+        f"{int(used_percent)}%",
+        ha="center",
+        va="center",
+        fontsize=20,
+        fontweight="bold",
+    )
+    ax.text(
+        0,
+        -0.15,
+        f"{calories} out of {daily_goal} used",
+        ha="center",
+        va="center",
+        fontsize=10,
+    )
 
     ax.set_aspect("equal")
 

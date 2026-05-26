@@ -7,6 +7,9 @@ name = "project-tools"
 version = "0.1.0"
 requires-python = ">=3.12"
 description = "Dev tools for testing and linting"
+dependencies = [
+    "matplotlib>=3.10.9",
+]
 
 
 [dependency-groups]

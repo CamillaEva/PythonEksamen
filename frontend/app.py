@@ -9,14 +9,9 @@ from components.recipes import show_recipes
 from sider.weekly_update import show_weekly_page
 from sider.about import show_about_page
 from sider.contact import show_contact_page
-from styles.colors import (PRIMARY_CHART_COLOR, EDGE_COLOR)
+from styles.colors import PRIMARY_CHART_COLOR, EDGE_COLOR
 from dotenv import load_dotenv
-from services.food_api import (
-    get_meals,
-    save_meal,
-    update_meal,
-    delete_meal
-)
+from services.food_api import get_meals, save_meal, update_meal, delete_meal
 import os
 
 # Constants
@@ -24,10 +19,12 @@ MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snacks"]
 DAILY_GOAL_KCAL = 2100
 EMPTY_COLUMS = ["Date", "Meal", "Food", "Gram", "Calories"]
 
+
 # Styling
 def load_css():
     with open("./styles/main.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 # Page config
 st.set_page_config(
@@ -38,17 +35,20 @@ st.set_page_config(
 
 load_css()
 
+
 # Mistral
 def create_mistral_client():
     load_dotenv()
-    return MistralClient(api_key = os.getenv("MISTRAL_API_KEY"))
+    return MistralClient(api_key=os.getenv("MISTRAL_API_KEY"))
+
 
 # Data
 def create_meals_dataframe(meals_data):
     if meals_data:
         return pd.DataFrame(meals_data)
-    
+
     return pd.DataFrame(columns=EMPTY_COLUMS)
+
 
 # Meal sections
 def show_meal_section(meal, df_today):
@@ -60,27 +60,24 @@ def show_meal_section(meal, df_today):
         st.write("No meals added yet.")
 
     for index, row in meal_rows.iterrows():
-        col1, col2, col3 = st.columns([5,1,1])
+        col1, col2, col3 = st.columns([5, 1, 1])
 
         with col1:
-            st.write(
-                f"{row['Food']} - "
-                f"{row['Gram']} gram - "
-                f"{row['Calories']} calories"
-            )
-        
+            st.write(f"{row['Food']} - {row['Gram']} gram - {row['Calories']} calories")
+
         with col2:
             if st.button("Update", key=f"update_{index}"):
                 st.session_state["edit_index"] = index
                 st.rerun()
-        
+
         with col3:
             if st.button("Delete", key=f"delete_{index}"):
                 delete_meal(index)
                 st.success("Meal deleted!")
                 st.rerun()
 
-# Forms 
+
+# Forms
 def show_add_meal_form(today):
     st.title("Daily board")
     st.subheader("FOODLOG")
@@ -96,11 +93,11 @@ def show_add_meal_form(today):
             calories = get_calories(food, gram)
 
             new_data = {
-                "Date" : today,
-                "Meal" : meal,
-                "Food" : food,
-                "Gram" : gram, 
-                "Calories" : calories
+                "Date": today,
+                "Meal": meal,
+                "Food": food,
+                "Gram": gram,
+                "Calories": calories,
             }
 
             save_meal(new_data)
@@ -108,10 +105,11 @@ def show_add_meal_form(today):
             st.success("Meal saved!")
             st.rerun()
 
+
 def show_update_form(df):
     if "edit_index" not in st.session_state:
         return
-    
+
     edit_index = st.session_state["edit_index"]
     row = df.loc[edit_index]
 
@@ -124,11 +122,11 @@ def show_update_form(df):
         updated_calories = get_calories(updated_food, updated_gram)
 
         updated_data = {
-            "Date" : row["Date"],
-            "Meal" : updated_meal,
-            "Food" : updated_food,
-            "Gram" : updated_gram,
-            "Calories" : updated_calories
+            "Date": row["Date"],
+            "Meal": updated_meal,
+            "Food": updated_food,
+            "Gram": updated_gram,
+            "Calories": updated_calories,
         }
 
         update_meal(edit_index, updated_data)
@@ -136,6 +134,7 @@ def show_update_form(df):
         del st.session_state["edit_index"]
         st.success("Meal updated!")
         st.rerun()
+
 
 # Dashboard
 def show_dashboard_page():
@@ -147,7 +146,7 @@ def show_dashboard_page():
 
     df_today = df[df["Date"] == today]
 
-    col1, col2 = st.columns([1,1])
+    col1, col2 = st.columns([1, 1])
 
     with col1:
         show_add_meal_form(today)
@@ -155,10 +154,10 @@ def show_dashboard_page():
 
         for meal in MEAL_TYPES:
             show_meal_section(meal, df_today)
-    
+
     with col2:
         st.markdown("###")
-        total_calories = (df_today["Calories"].sum())
+        total_calories = df_today["Calories"].sum()
 
         fig = donut_chart(total_calories, DAILY_GOAL_KCAL)
 
@@ -166,37 +165,28 @@ def show_dashboard_page():
         client = create_mistral_client()
         show_recipes(client)
 
+
 # Navigation
 selected = option_menu(
     menu_title=None,
-    options=[
-        "Dashboard",
-        "Weekly update",
-        "Contact",
-        "About"
-    ],
-    icons=[
-        "house-fill",
-        "calendar-check-fill",
-        "envelope-fill",
-        "info-circle-fill"
-    ],
+    options=["Dashboard", "Weekly update", "Contact", "About"],
+    icons=["house-fill", "calendar-check-fill", "envelope-fill", "info-circle-fill"],
     default_index=0,
     orientation="horizontal",
-    styles={ 
-         "container": {
+    styles={
+        "container": {
             "background-color": PRIMARY_CHART_COLOR,
             "padding": "0!important",
-            "max-width": "100%"
+            "max-width": "100%",
         },
         "nav-link": {
             "font-size": "16px",
         },
         "nav-link-selected": {
             "background-color": EDGE_COLOR,
-            "color": PRIMARY_CHART_COLOR
+            "color": PRIMARY_CHART_COLOR,
         },
-    }
+    },
 )
 
 # Routing
