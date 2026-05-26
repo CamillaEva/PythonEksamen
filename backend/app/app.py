@@ -4,27 +4,30 @@ import pandas as pd
 import os
 from app.models.Meal import Meal, FILE_NAME
 
-
 app = FastAPI()
-    
-    
-    
 
+def load_meals_dataframe():
+    if not os.path.exists(FILE_NAME):
+        return None
+    
+    return pd.read_csv(FILE_NAME)
+
+# Root
 @app.get("/")
 def root():
     return {"message": "FastAPI virker"}
 
-
+# Get
 @app.get("/meals")
-def get_meals():
-    if not os.path.exists(FILE_NAME):
-        return []
+def get_meals(): 
+    df = load_meals_dataframe()
     
-    df = pd.read_csv(FILE_NAME)
+    if df is None:
+        return []
     
     return df.to_dict(orient="records")
 
-
+# Post
 @app.post("/meals")
 def add_meal(meal: Meal):
     
@@ -38,14 +41,14 @@ def add_meal(meal: Meal):
     return {"message": "Meal saved"}
 
 
-# ---------- UPDATE ----------
+# Update
 @app.put("/meals/{meal_index}")
 def update_meal(meal_index: int, updated_meal: Meal):
 
-    if not os.path.exists(FILE_NAME):
-        return {"error": "File not found"}
+    df = load_meals_dataframe()
 
-    df = pd.read_csv(FILE_NAME)
+    if df is None:
+        return {"error": "File not found"}
 
     if meal_index not in df.index:
         return {"error": "Meal not found"}
@@ -57,15 +60,15 @@ def update_meal(meal_index: int, updated_meal: Meal):
     return {"message": "Meal updated"}
 
 
-# ---------- DELETE ----------
+# Delete
 @app.delete("/meals/{meal_index}")
 def delete_meal(meal_index: int):
 
-    if not os.path.exists(FILE_NAME):
+    df = load_meals_dataframe()
+    
+    if df is None:
         return {"error": "File not found"}
-
-    df = pd.read_csv(FILE_NAME)
-
+    
     if meal_index not in df.index:
         return {"error": "Meal not found"}
 
