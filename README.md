@@ -18,16 +18,29 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/CamillaEva/PythonEksamen
+cd PythonEksamen
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ### Running with Docker
 
 The application can be started using Docker Compose.
 
-### Start the application:
+### Build and start the application the first time:
 
 ```bash
 docker compose up --build
+```
+
+### after the first build, start application with: 
+
+```bash
+docker compose up
 ```
 
 ### To stop the containers:
@@ -53,3 +66,15 @@ https://admin.mistral.ai/organization/api-keys
 ### USDA
 
 https://fdc.nal.usda.gov/api-key-signup
+
+
+## Tests
+
+The project includes automated tests using pytest.
+
+To run the tests manually:
+
+```bash
+cd backend
+$ PYTHONPATH=. uv run pytest
+```
